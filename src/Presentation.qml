@@ -40,8 +40,9 @@
 ****************************************************************************/
 
 
-import QtQuick 2.0
+import QtQuick 2.4
 import QtQuick.Window 2.0
+import QtQuick.Controls 1.3
 
 Item {
     id: root
@@ -54,8 +55,8 @@ Item {
 
     property color titleColor: textColor;
     property color textColor: "black"
-    property string fontFamily: "Helvetica"
-    property string codeFontFamily: "Courier New"
+    property string fontFamily: "Ubuntu"
+    property string codeFontFamily: "Ubuntu"
 
     // Private API
     property bool _faded: false
@@ -112,10 +113,10 @@ Item {
         if (root.currentSlide - 1 >= 0) {
             var from = slides[currentSlide]
             var to = slides[currentSlide - 1]
-           if (switchSlides(from, to, false)) {
+            if (switchSlides(from, to, false)) {
                 currentSlide = currentSlide - 1;
-               root.focus = true;
-           }
+                root.focus = true;
+            }
         }
     }
 
@@ -128,10 +129,10 @@ Item {
         else if (root.currentSlide != _userNum) {
             var from = slides[currentSlide]
             var to = slides[_userNum]
-           if (switchSlides(from, to, _userNum > currentSlide)) {
+            if (switchSlides(from, to, _userNum > currentSlide)) {
                 currentSlide = _userNum;
-               root.focus = true;
-           }
+                root.focus = true;
+            }
         }
     }
 
@@ -186,61 +187,58 @@ Item {
         title: "QML Presentation: Notes"
         visible: root.showNotes
 
-        Flickable {
+
+        //TextArea needed to be able to copy sample code into the livecoding arena
+        TextArea {
+            id: notesText
+
+            property real padding: 16;
+
+            x: padding
+            y: padding
             anchors.fill: parent
-            contentWidth: parent.width
-            contentHeight: textContainer.height
+            anchors.margins: units.gu(2)
 
-            Item {
-                id: textContainer
-                width: parent.width
-                height: notesText.height + 2 * notesText.padding
+            font.pixelSize: 72
+            wrapMode: Text.WordWrap
 
-                Text {
-                    id: notesText
+            property string notes: root.slides[root.currentSlide].notes;
+            property string codeSample: root.slides[root.currentSlide].codeSample;
 
-                    property real padding: 16;
+            function formatText() {
+                var result = "";
 
-                    x: padding
-                    y: padding
-                    width: parent.width - 2 * padding
-
-
-                    font.pixelSize: 16
-                    wrapMode: Text.WordWrap
-
-                    property string notes: root.slides[root.currentSlide].notes;
-
-                    onNotesChanged: {
-                        var result = "";
-
-                        var lines = notes.split("\n");
-                        var beginNewLine = false
-                        for (var i=0; i<lines.length; ++i) {
-                            var line = lines[i].trim();
-                            if (line.length == 0) {
-                                beginNewLine = true;
-                            } else {
-                                if (beginNewLine && result.length) {
-                                    result += "\n\n"
-                                    beginNewLine = false
-                                }
-                                if (result.length > 0)
-                                    result += " ";
-                                result += line;
-                            }
+                var lines = notes.split("\n");
+                var beginNewLine = false
+                for (var i=0; i<lines.length; ++i) {
+                    var line = lines[i];
+                    if (line.length == 0) {
+                        beginNewLine = true;
+                    } else {
+                        if (beginNewLine && result.length) {
+                            result += "\n\n"
+                            beginNewLine = false
                         }
-
-                        if (result.length == 0) {
-                            font.italic = true;
-                            text = "no notes.."
-                        } else {
-                            font.italic = false;
-                            text = result;
-                        }
+                        if (result.length > 0)
+                            result += " ";
+                        result += line;
                     }
                 }
+
+                result += "\n" + codeSample
+
+                if (result.length == 0) {
+                    font.italic = true;
+                    text = "no notes.."
+                } else {
+                    font.italic = false;
+                    text = result;
+                }
             }
+
+            onCodeSampleChanged: formatText()
+            onNotesChanged: formatText()
         }
+
     }
 }

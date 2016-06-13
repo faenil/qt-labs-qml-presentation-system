@@ -69,6 +69,7 @@ void SlideView::updateStatus(QQuickView::Status status) {
     qDebug() << "SlideCount: " << m_slidesLeft;
     qDebug() << "Printer's Page rect size (and suggested resolution of your presentation): " << m_printer.pageRect().size();
     m_printer.setOrientation(QPrinter::Landscape);
+    //m_printer.setPageSize(QPageSize(QSize(1024,768), QPageSize::Millimeter));
     m_printer.setFullPage(true);
     m_printer.setOutputFileName("slides.pdf");
     m_painter.begin(&m_printer);
@@ -87,7 +88,7 @@ void SlideView::updateStatus(QQuickView::Status status) {
     //ri->setWidth(width());
 
     // start timer to print out pages once every 2 seconds.
-    m_tid = startTimer(2000);
+    m_tid = startTimer(50);
 }
 
 void SlideView::timerEvent(QTimerEvent*) {

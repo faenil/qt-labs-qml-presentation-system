@@ -50,6 +50,8 @@ Item {
 
     id: slide
 
+    property bool verticallyCenterTitle: false
+    property bool useUbuntuBackground: false
     property bool isSlide: true;
 
     property bool delayPoints: false;
@@ -66,19 +68,21 @@ Item {
     }
 
     property string title;
+    property string subtitle;
     property variant content: []
     property string centeredText
     property string writeInText;
     property string notes;
+    property string codeSample;
 
-    property real fontSize: parent.height * 0.05
+    property real fontSize: parent.height * 0.04
     property real fontScale: 1
 
     property real baseFontSize: fontSize * fontScale
     property real titleFontSize: fontSize * 1.2 * fontScale
     property real bulletSpacing: 1
 
-    property real contentWidth: width
+    property real contentWidth: useUbuntuBackground ? width : width/2
 
     // Define the slide to be the "content area"
     x: parent.width * 0.05
@@ -92,22 +96,44 @@ Item {
     property color titleColor: parent.titleColor;
     property color textColor: parent.textColor;
     property string fontFamily: parent.fontFamily;
-    property int textFormat: Text.PlainText
+    property int textFormat: Text.StyledText
 
     visible: false
 
-    Text {
-        id: titleText
-        font.pixelSize: titleFontSize
-        text: title;
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.top
-        anchors.bottomMargin: parent.fontSize * 1.5
-        font.bold: true;
-        font.family: slide.fontFamily
-        color: slide.titleColor
-        horizontalAlignment: Text.Center
-        z: 1
+    Column {
+        anchors.bottom: verticallyCenterTitle ? undefined : parent.top
+        anchors.bottomMargin: verticallyCenterTitle ? 0 : parent.fontSize * 1.5
+        anchors.verticalCenter: verticallyCenterTitle ? parent.verticalCenter : undefined
+        anchors.verticalCenterOffset: verticallyCenterTitle ? -slide.y/2 : 0
+        anchors.left: parent.left
+        anchors.right: parent.right
+        Text {
+            id: titleText
+            font.pixelSize: titleFontSize
+            text: title;
+            anchors.left: parent.left
+            anchors.right: parent.right
+            wrapMode: Text.WordWrap
+            font.bold: true;
+            font.family: slide.fontFamily
+            color: slide.titleColor
+            horizontalAlignment: verticallyCenterTitle ? Text.AlignLeft : Text.AlignHCenter
+            z: 1
+        }
+        Text {
+            id: subtitleText
+            anchors.left: parent.left
+            anchors.right: parent.right
+            visible: text !== ""
+            font.pixelSize: titleFontSize
+            text: subtitle;
+            horizontalAlignment: verticallyCenterTitle ? Text.AlignLeft : Text.AlignHCenter
+
+            font.family: slide.fontFamily
+            color: slide.titleColor
+            z: 1
+        }
+
     }
 
     Text {
@@ -148,8 +174,7 @@ Item {
 
     Column {
         id: contentId
-        anchors.fill: parent
-
+        anchors.verticalCenter: parent.verticalCenter
         Repeater {
             model: content.length
 

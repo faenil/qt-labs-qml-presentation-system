@@ -1,6 +1,11 @@
 This is a slide presentation system written in QML.
 
 
+Requirements
+----------
+This module requires Qt5.4 and QtQuickControls 1.3 (patch out the TextArea in presentation.qml if you can't install QtQuickControls)
+
+
 
 Installing
 ----------
